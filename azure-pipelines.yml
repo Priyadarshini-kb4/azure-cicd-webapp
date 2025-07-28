@@ -1,0 +1,25 @@
+trigger:
+- main
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  imageName: 'azure-cicd-webapp'
+
+steps:
+- task: Docker@2
+  inputs:
+    containerRegistry: 'your-acr-service-connection'
+    repository: '$(imageName)'
+    command: 'buildAndPush'
+    Dockerfile: '**/Dockerfile'
+    tags: |
+      $(Build.BuildId)
+
+- task: AzureWebAppContainer@1
+  inputs:
+    azureSubscription: 'your-azure-subscription-name'
+    appName: 'your-app-service-name'
+    containers: 'youracr.azurecr.io/$(imageName):$(Build.BuildId)'
+
