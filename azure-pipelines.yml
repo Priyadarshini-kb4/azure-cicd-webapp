@@ -1,25 +1,19 @@
-trigger:
-- main
+jobs:
+- job: Job
+  pool:
+    vmImage: ubuntu-latest
+  steps:
+  - task: Docker@2
+    inputs:
+      containerRegistry: 'my-acr-connection'   # 🔄 UPDATE this
+      repository: 'webappimage'
+      command: 'buildAndPush'
+      Dockerfile: '**/Dockerfile'
+      tags: |
+        latest
 
-pool:
-  vmImage: ubuntu-latest
-
-variables:
-  imageName: 'azure-cicd-webapp'
-
-steps:
-- task: Docker@2
-  inputs:
-    containerRegistry: 'your-acr-service-connection'
-    repository: '$(imageName)'
-    command: 'buildAndPush'
-    Dockerfile: '**/Dockerfile'
-    tags: |
-      $(Build.BuildId)
-
-- task: AzureWebAppContainer@1
-  inputs:
-    azureSubscription: 'your-azure-subscription-name'
-    appName: 'your-app-service-name'
-    containers: 'youracr.azurecr.io/$(imageName):$(Build.BuildId)'
-
+  - task: AzureWebAppContainer@1
+    inputs:
+      azureSubscription: 'my-azure-subscription'  # 🔄 UPDATE this
+      appName: 'your-webapp-name'                # Replace with actual App Service name
+      containers: 'priyacrdemo.azurecr.io/webappimage:latest'
